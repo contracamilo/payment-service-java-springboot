@@ -5,8 +5,31 @@
 `u-backend` is a backend application developed with Spring Boot and SQL. This project manages payments and students, allowing CRUD operations on these entities.
 
 ## Project Structure
-
-
+```sh
+.
+├── java
+│   └── com
+│       └── payment_system
+│           └── u_backend
+│               ├── UBackendApplication.java
+│               ├── dtos
+│               │   └── NewPaymentDTO.java
+│               ├── emuns
+│               │   ├── PaymentStatus.java
+│               │   └── PaymentType.java
+│               ├── entities
+│               │   ├── Payment.java
+│               │   └── Student.java
+│               ├── repositories
+│               │   ├── PaymentRepository.java
+│               │   └── StudentRepository.java
+│               └── services
+│                   └── PaymentService.java
+└── resources
+    ├── application.properties
+    ├── static
+    └── templates
+```
 ## Dependencies
 
 The project uses the following dependencies:
