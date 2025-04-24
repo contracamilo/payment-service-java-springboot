@@ -1,7 +1,7 @@
 package com.payment_system.controller;
 
 import com.payment_system.model.Payment;
-import com.payment_system.repository.PaymentRepository;
+import com.payment_system.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,26 +13,25 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
 @Tag(name = "Pagos", description = "API para gestionar pagos")
 @CrossOrigin(origins = "*")
 public class PaymentController {
 
     @Autowired
-    private PaymentRepository paymentRepository;
+    private PaymentService paymentService;
 
     @GetMapping("/pagos")
     @Operation(summary = "Obtener todos los pagos")
     @ApiResponse(responseCode = "200", description = "Lista de pagos obtenida correctamente")
     public List<Payment> getAllPayments() {
-        return paymentRepository.findAll();
+        return paymentService.getAllPayments();
     }
 
     @PostMapping("/pagos")
     @Operation(summary = "Crear un nuevo pago")
     @ApiResponse(responseCode = "200", description = "Pago creado correctamente")
     public Payment createPayment(@RequestBody Payment payment) {
-        return paymentRepository.save(payment);
+        return paymentService.createPayment(payment);
     }
 
     @GetMapping("/pagos/{id}")
@@ -42,9 +41,21 @@ public class PaymentController {
         @ApiResponse(responseCode = "404", description = "Pago no encontrado")
     })
     public ResponseEntity<Payment> getPaymentById(@PathVariable Long id) {
-        return paymentRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Payment payment = paymentService.getPaymentById(id);
+        return payment != null ? ResponseEntity.ok(payment) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/pagos/{id}/status")
+    @Operation(summary = "Obtener un pago por ID y estado")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pago encontrado"),
+        @ApiResponse(responseCode = "404", description = "Pago no encontrado")
+    })
+    public ResponseEntity<Payment> getPaymentByIdAndStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+        Payment payment = paymentService.getPaymentByIdAndStatus(id, status);
+        return payment != null ? ResponseEntity.ok(payment) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/pagos/{pagoId}/actualizarPago")
@@ -56,26 +67,22 @@ public class PaymentController {
     public ResponseEntity<Payment> updatePaymentStatus(
             @PathVariable Long pagoId,
             @RequestBody Payment paymentDetails) {
-        return paymentRepository.findById(pagoId)
-                .map(payment -> {
-                    payment.setStatus(paymentDetails.getStatus());
-                    return ResponseEntity.ok(paymentRepository.save(payment));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Payment payment = paymentService.updatePaymentStatus(pagoId, paymentDetails.getStatus());
+        return payment != null ? ResponseEntity.ok(payment) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/pagosPorStatus")
     @Operation(summary = "Obtener pagos por estado")
     @ApiResponse(responseCode = "200", description = "Lista de pagos filtrada por estado")
     public List<Payment> getPaymentsByStatus(@RequestParam String status) {
-        return paymentRepository.findByStatus(status);
+        return paymentService.getPaymentsByStatus(status);
     }
 
     @GetMapping("/pagos/porTipo")
     @Operation(summary = "Obtener pagos por tipo")
     @ApiResponse(responseCode = "200", description = "Lista de pagos filtrada por tipo")
     public List<Payment> getPaymentsByType(@RequestParam String tipo) {
-        return paymentRepository.findByType(tipo);
+        return paymentService.getPaymentsByType(tipo);
     }
 
     @GetMapping("/pagoFile/{pagoId}")
@@ -85,8 +92,7 @@ public class PaymentController {
         @ApiResponse(responseCode = "404", description = "Archivo no encontrado")
     })
     public ResponseEntity<String> getPaymentFile(@PathVariable Long pagoId) {
-        return paymentRepository.findById(pagoId)
-                .map(payment -> ResponseEntity.ok("Archivo del pago " + pagoId))
-                .orElse(ResponseEntity.notFound().build());
+        Payment payment = paymentService.getPaymentById(pagoId);
+        return payment != null ? ResponseEntity.ok("Archivo del pago " + pagoId) : ResponseEntity.notFound().build();
     }
 } 
