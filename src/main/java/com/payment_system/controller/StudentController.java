@@ -59,4 +59,39 @@ public class StudentController {
     public List<Payment> getStudentPayments(@PathVariable String codigo) {
         return paymentService.getPaymentsByStudentCodigo(codigo);
     }
+
+    @PostMapping("/estudiantes")
+    @Operation(summary = "Crear un nuevo estudiante")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Estudiante creado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos de estudiante inválidos")
+    })
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
+        Student createdStudent = studentService.createStudent(student);
+        return ResponseEntity.ok(createdStudent);
+    }
+
+    @PutMapping("/estudiantes/{codigo}")
+    @Operation(summary = "Actualizar un estudiante existente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Estudiante actualizado correctamente"),
+        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado")
+    })
+    public ResponseEntity<Student> updateStudent(
+            @PathVariable String codigo,
+            @RequestBody Student studentDetails) {
+        Student updatedStudent = studentService.updateStudent(codigo, studentDetails);
+        return updatedStudent != null ? ResponseEntity.ok(updatedStudent) : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/estudiantes/{codigo}")
+    @Operation(summary = "Eliminar un estudiante")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Estudiante eliminado correctamente"),
+        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado")
+    })
+    public ResponseEntity<Void> deleteStudent(@PathVariable String codigo) {
+        boolean deleted = studentService.deleteStudent(codigo);
+        return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+    }
 } 
