@@ -2,8 +2,8 @@ package com.payment_system.controller;
 
 import com.payment_system.model.Student;
 import com.payment_system.model.Payment;
-import com.payment_system.repository.StudentRepository;
-import com.payment_system.repository.PaymentRepository;
+import com.payment_system.service.StudentService;
+import com.payment_system.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,22 +15,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
 @Tag(name = "Estudiantes", description = "API para gestionar estudiantes")
 @CrossOrigin(origins = "*")
 public class StudentController {
 
     @Autowired
-    private StudentRepository studentRepository;
+    private StudentService studentService;
 
     @Autowired
-    private PaymentRepository paymentRepository;
+    private PaymentService paymentService;
 
     @GetMapping("/estudiantes")
     @Operation(summary = "Obtener todos los estudiantes")
     @ApiResponse(responseCode = "200", description = "Lista de estudiantes obtenida correctamente")
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        return studentService.getAllStudents();
     }
 
     @GetMapping("/estudiantes/{codigo}")
@@ -40,7 +39,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado")
     })
     public ResponseEntity<Student> getStudentByCodigo(@PathVariable String codigo) {
-        Student student = studentRepository.findByCodigo(codigo);
+        Student student = studentService.getStudentByCodigo(codigo);
         return student != null ? ResponseEntity.ok(student) : ResponseEntity.notFound().build();
     }
 
@@ -48,7 +47,7 @@ public class StudentController {
     @Operation(summary = "Obtener estudiantes por programa")
     @ApiResponse(responseCode = "200", description = "Lista de estudiantes filtrada por programa")
     public List<Student> getStudentsByProgram(@PathVariable String programaId) {
-        return studentRepository.findByProgramaId(programaId);
+        return studentService.getStudentsByPrograma(programaId);
     }
 
     @GetMapping("/estudiantes/{codigo}/pagos")
@@ -58,6 +57,6 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado")
     })
     public List<Payment> getStudentPayments(@PathVariable String codigo) {
-        return paymentRepository.findByEstudianteCodigo(codigo);
+        return paymentService.getPaymentsByStudentCodigo(codigo);
     }
 } 
