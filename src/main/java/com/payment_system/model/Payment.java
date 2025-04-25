@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import java.time.LocalDate;
 
 /**
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED) // Protegido para evitar uso incorrecto
 public class Payment {
     /** Identificador único del pago (auto-incrementable) */
     @Id
@@ -39,4 +40,23 @@ public class Payment {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "student_id")
     private Student estudiante;
+    
+    /**
+     * Constructor para crear nuevos pagos sin ID (el ID será generado por la base de datos)
+     * 
+     * @param fecha Fecha del pago
+     * @param monto Monto del pago
+     * @param type Tipo de pago
+     * @param status Estado del pago
+     * @param file URL o ruta del archivo
+     * @param estudiante Estudiante asociado
+     */
+    public Payment(LocalDate fecha, Double monto, String type, String status, String file, Student estudiante) {
+        this.fecha = fecha;
+        this.monto = monto;
+        this.type = type;
+        this.status = status;
+        this.file = file;
+        this.estudiante = estudiante;
+    }
 } 
