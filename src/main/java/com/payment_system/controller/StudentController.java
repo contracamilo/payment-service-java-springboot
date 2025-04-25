@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -85,13 +86,12 @@ public class StudentController {
     }
 
     @DeleteMapping("/estudiantes/{codigo}")
-    @Operation(summary = "Eliminar un estudiante")
+    @Operation(summary = "Eliminar un estudiante por código")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Estudiante eliminado correctamente"),
-        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado")
+        @ApiResponse(responseCode = "204", description = "Estudiante(s) eliminado(s) correctamente o no encontrado(s)")
     })
     public ResponseEntity<Void> deleteStudent(@PathVariable String codigo) {
-        boolean deleted = studentService.deleteStudent(codigo);
-        return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        studentService.deleteStudent(codigo);
+        return ResponseEntity.noContent().build();
     }
 } 
